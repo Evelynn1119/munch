@@ -1,68 +1,74 @@
-// Munch Munch — prototype shell. Launcher → pick one of the three flows.
-// Note: the Instagram post/share-sheet (Flow 2) and the lock screen (Flow 3)
-// are illustrative CONTEXT only — they mock how the app gets invoked from
-// outside. The real Munch Munch app begins once the share/notification fires.
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
+// Munch Munch — a single restaurant-saving app.
+// Boots to onboarding until an account exists, then a tabbed app. All state
+// is local (AsyncStorage) — no API providers, fully self-contained.
+import React from 'react';
+import { View, Text, StatusBar, ActivityIndicator } from 'react-native';
 import { C } from './theme';
-import Flow1 from './flows/Flow1';
-import Flow2 from './flows/Flow2';
-import Flow3 from './flows/Flow3';
+import { StoreProvider, useStore } from './src/store';
+import { NavProvider, useNav } from './src/nav';
+import TabBar from './src/components/TabBar';
+import Onboarding from './src/screens/Onboarding';
+import Home from './src/screens/Home';
+import Explore from './src/screens/Explore';
+import Lists, { ListDetail } from './src/screens/Lists';
+import Profile from './src/screens/Profile';
+import RestaurantDetail from './src/screens/RestaurantDetail';
+import AddRestaurant from './src/screens/AddRestaurant';
+import RateVisit from './src/screens/RateVisit';
+import PlanWithFriend from './src/screens/PlanWithFriend';
 
-const FLOWS = [
-  { key: 1, title: 'Onboarding', sub: 'New here — teach the app your taste', tag: 'IN-APP', C: Flow1 },
-  { key: 2, title: 'Save from Instagram', sub: 'Share an IG post into Munch Munch', tag: 'CONTEXT: IG', C: Flow2 },
-  { key: 3, title: 'Notification', sub: 'Rate a visit + plan a friend\'s birthday', tag: 'CONTEXT: LOCK', C: Flow3 },
-];
+const TABS = { home: Home, explore: Explore, lists: Lists, profile: Profile };
 
-export default function App() {
-  const [flow, setFlow] = useState(null);
-  const Active = flow && FLOWS.find((f) => f.key === flow).C;
+function Root() {
+  const { state } = useStore();
+  const { tab, top } = useNav();
 
-  if (Active) {
+  if (!state._ready) {
     return (
-      <>
-        <StatusBar barStyle="light-content" />
-        <Active onExit={() => setFlow(null)} />
-      </>
+      <View style={{ flex: 1, backgroundColor: C.brand, alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <Text style={{ fontSize: 34, fontWeight: '800', color: '#fff' }}>Munch Munch</Text>
+        <ActivityIndicator color="rgba(255,255,255,0.7)" />
+      </View>
     );
   }
 
+  if (!state.user) {
+    return <Onboarding />;
+  }
+
+  const TabScreen = TABS[tab] || Home;
+
   return (
-    <View style={s.wrap}>
-      <StatusBar barStyle="light-content" />
-      <View style={s.hero}>
-        <Text style={s.logo}>Munch{'\n'}Munch</Text>
-        <Text style={s.tagline}>case-study prototype · 3 flows</Text>
-      </View>
-      <View style={s.list}>
-        {FLOWS.map((f) => (
-          <TouchableOpacity key={f.key} style={s.card} activeOpacity={0.85} onPress={() => setFlow(f.key)}>
-            <View style={{ flex: 1 }}>
-              <Text style={s.cardTitle}>{f.title}</Text>
-              <Text style={s.cardSub}>{f.sub}</Text>
-            </View>
-            <View style={s.tag}><Text style={s.tagTxt}>{f.tag}</Text></View>
-            <Text style={s.chev}>›</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <Text style={s.foot}>Tap a flow to run it · ✕ flows returns here</Text>
+    <View style={{ flex: 1, backgroundColor: C.bg }}>
+      <View style={{ flex: 1 }}><TabScreen /></View>
+      <TabBar />
+      {top && (
+        <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: C.bg }}>
+          <StackScreen screen={top.screen} params={top.params} />
+        </View>
+      )}
     </View>
   );
 }
 
-const s = StyleSheet.create({
-  wrap: { flex: 1, backgroundColor: C.brand },
-  hero: { paddingTop: 90, paddingBottom: 40, alignItems: 'center' },
-  logo: { fontSize: 48, fontWeight: '800', color: '#fff', textAlign: 'center', lineHeight: 52 },
-  tagline: { fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 16, letterSpacing: 1 },
-  list: { paddingHorizontal: 20, gap: 14 },
-  card: { backgroundColor: 'rgba(255,255,255,0.08)', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', borderRadius: 18, padding: 20, flexDirection: 'row', alignItems: 'center', gap: 10 },
-  cardTitle: { fontSize: 18, fontWeight: '700', color: '#fff' },
-  cardSub: { fontSize: 13, color: 'rgba(255,255,255,0.55)', marginTop: 4 },
-  tag: { backgroundColor: 'rgba(255,255,255,0.12)', borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4 },
-  tagTxt: { fontSize: 9, fontWeight: '700', color: 'rgba(255,255,255,0.7)', letterSpacing: 0.5 },
-  chev: { fontSize: 24, color: 'rgba(255,255,255,0.4)' },
-  foot: { position: 'absolute', bottom: 40, left: 0, right: 0, textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.35)' },
-});
+function StackScreen({ screen, params }) {
+  switch (screen) {
+    case 'detail': return <RestaurantDetail id={params.id} />;
+    case 'rate': return <RateVisit id={params.id} />;
+    case 'add': return <AddRestaurant />;
+    case 'plan': return <PlanWithFriend friendId={params.friendId} />;
+    case 'listDetail': return <ListDetail listId={params.listId} />;
+    default: return null;
+  }
+}
+
+export default function App() {
+  return (
+    <StoreProvider>
+      <NavProvider>
+        <StatusBar barStyle="light-content" />
+        <Root />
+      </NavProvider>
+    </StoreProvider>
+  );
+}
