@@ -5,14 +5,54 @@ import { C } from '../../theme';
 import { useStore } from '../store';
 import { useNav } from '../nav';
 
+function recallSignal(r) {
+  const numDays = parseInt(r.savedAgo);
+  if (!isNaN(numDays) && numDays >= 30) return { chip: `${numDays}d saved`, reason: 'Getting dusty — time to book?' };
+  if (r.tags.some(t => /omakase|special/i.test(t))) return { chip: 'Special occasion', reason: 'You were saving this for something big' };
+  if (r.tags.some(t => /date/i.test(t))) return { chip: 'Date night pick', reason: 'Perfect for this weekend?' };
+  if (r.source === 'Instagram') return { chip: 'From your IG', reason: 'Still living in your head?' };
+  return { chip: r.savedAgo, reason: 'Still on your list' };
+}
+
+function SmartRecall({ items, onPress }) {
+  if (!items.length) return null;
+  return (
+    <View style={{ marginTop: 22 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'baseline', paddingHorizontal: 14, marginBottom: 12 }}>
+        <Text style={sr.title}>✨  Munch recalls</Text>
+        <Text style={sr.sub}>  · {items.length} places waiting</Text>
+      </View>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 14, gap: 10 }}>
+        {items.map((r) => {
+          const { chip, reason } = recallSignal(r);
+          return (
+            <TouchableOpacity key={r.id} style={sr.card} activeOpacity={0.88} onPress={() => onPress(r.id)}>
+              <Image source={{ uri: r.image }} style={sr.img} />
+              <View style={sr.pill}><Text style={sr.pillTxt}>{chip}</Text></View>
+              <View style={sr.body}>
+                <Text style={sr.name} numberOfLines={1}>{r.name}</Text>
+                <Text style={sr.meta}>{r.cuisine} · {r.area}</Text>
+                <Text style={sr.cta}>{reason}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+}
+
 export default function Home() {
   const { state } = useStore();
   const { navigate, switchTab } = useNav();
   const first = state.user?.name?.split(' ')[0] || 'there';
   const friend = [...state.friends].sort((a, b) => a.birthdayInDays - b.birthdayInDays)[0];
   const friendRest = friend && state.restaurants.find((r) => friend.wishlist.includes(r.id));
-  const longSaved = state.restaurants.find((r) => !r.visited && r.savedAgo.includes('days'));
   const curated = state.restaurants.find((r) => r.cuisine === 'Italian');
+  const recallItems = state.restaurants
+    .filter((r) => !r.visited && r.savedAgo !== 'Suggested')
+    .sort((a, b) => (parseInt(b.savedAgo) || 0) - (parseInt(a.savedAgo) || 0))
+    .slice(0, 4);
 
   return (
     <View style={{ flex: 1, backgroundColor: C.bg }}>
@@ -75,12 +115,7 @@ export default function Home() {
           </View>
         )}
 
-        {longSaved && (
-          <TouchableOpacity style={s.nudge} activeOpacity={0.85} onPress={() => navigate('detail', { id: longSaved.id })}>
-            <View style={s.nudgeDot} />
-            <Text style={s.nudgeTxt}>You saved <Text style={{ fontWeight: '700' }}>{longSaved.name}</Text> {longSaved.savedAgo} — still want to go?</Text>
-          </TouchableOpacity>
-        )}
+        <SmartRecall items={recallItems} onPress={(id) => navigate('detail', { id })} />
       </ScrollView>
     </View>
   );
@@ -112,7 +147,17 @@ const s = StyleSheet.create({
   sectionLbl: { fontSize: 11, fontWeight: '700', color: C.brand, letterSpacing: 0.5, marginBottom: 9 },
   banner: { borderRadius: 14, overflow: 'hidden', height: 140, justifyContent: 'flex-end', padding: 14 },
   bannerTxt: { fontSize: 18, fontWeight: '800', color: '#fff' },
-  nudge: { marginHorizontal: 14, marginTop: 14, backgroundColor: '#fff', borderRadius: 12, padding: 14, borderWidth: 0.5, borderColor: C.border, flexDirection: 'row', alignItems: 'center', gap: 8 },
-  nudgeDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.brand },
-  nudgeTxt: { flex: 1, fontSize: 13, color: C.body },
+});
+
+const sr = StyleSheet.create({
+  title: { fontSize: 15, fontWeight: '800', color: C.ink },
+  sub: { fontSize: 12, color: C.sub },
+  card: { width: 168, backgroundColor: '#fff', borderRadius: 16, overflow: 'hidden', borderWidth: 0.5, borderColor: C.border },
+  img: { width: '100%', height: 100 },
+  pill: { position: 'absolute', top: 8, left: 8, backgroundColor: 'rgba(8,58,130,0.82)', borderRadius: 20, paddingHorizontal: 8, paddingVertical: 3 },
+  pillTxt: { fontSize: 10, fontWeight: '700', color: '#fff' },
+  body: { padding: 10, gap: 2 },
+  name: { fontSize: 13, fontWeight: '700', color: C.ink },
+  meta: { fontSize: 11, color: C.sub },
+  cta: { fontSize: 11, color: C.brand, fontWeight: '600', marginTop: 4 },
 });

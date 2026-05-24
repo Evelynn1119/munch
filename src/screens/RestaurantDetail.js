@@ -18,8 +18,8 @@ export default function RestaurantDetail({ id }) {
       <View style={s.hero}>
         <Image source={{ uri: r.image }} style={StyleSheet.absoluteFill} />
         <LinearGradient colors={['transparent', 'rgba(8,58,130,0.85)']} style={StyleSheet.absoluteFill} />
-        <View style={{ height: 28 }} />
-        <TouchableOpacity onPress={goBack} hitSlop={12} style={s.backBtn}>
+        <View style={{ height: 52 }} />
+        <TouchableOpacity onPress={goBack} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }} style={s.backBtn}>
           <Text style={s.back}>‹</Text>
         </TouchableOpacity>
         <View style={s.heroInfo}>
@@ -70,7 +70,7 @@ export default function RestaurantDetail({ id }) {
 
 const s = StyleSheet.create({
   hero: { height: 250 },
-  backBtn: { position: 'absolute', top: 30, left: 12, width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'center', justifyContent: 'center' },
+  backBtn: { position: 'absolute', top: 52, left: 16, width: 44, height: 44, borderRadius: 22, backgroundColor: 'rgba(0,0,0,0.35)', alignItems: 'center', justifyContent: 'center' },
   back: { fontSize: 26, color: '#fff', lineHeight: 28 },
   heroInfo: { position: 'absolute', bottom: 16, left: 16, right: 16 },
   name: { fontSize: 24, fontWeight: '800', color: '#fff', marginBottom: 4 },

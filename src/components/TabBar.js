@@ -5,8 +5,8 @@ import { useNav } from '../nav';
 
 const TABS = [
   { key: 'home', icon: '🏠', label: 'Home' },
-  { key: 'explore', icon: '🔍', label: 'Explore' },
-  { key: 'lists', icon: '⭐', label: 'Lists' },
+  { key: 'explore', icon: '🗺️', label: 'Map' },
+  { key: 'lists', icon: '✨', label: 'AI Chat' },
   { key: 'profile', icon: '👤', label: 'Profile' },
 ];
 

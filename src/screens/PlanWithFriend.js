@@ -45,9 +45,9 @@ export default function PlanWithFriend({ friendId }) {
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View style={{ height: 28, backgroundColor: C.brand }} />
+      <View style={{ height: 52, backgroundColor: C.brand }} />
       <View style={s.header}>
-        <TouchableOpacity onPress={goBack} hitSlop={12}><Text style={s.back}>‹</Text></TouchableOpacity>
+        <TouchableOpacity onPress={goBack} hitSlop={{ top: 16, bottom: 16, left: 16, right: 16 }}><Text style={s.back}>‹</Text></TouchableOpacity>
         <Text style={s.title}>{friend.name}'s birthday · {friend.birthdayInDays} days</Text>
       </View>
       <ScrollView ref={scroller} style={{ flex: 1 }} contentContainerStyle={{ padding: 14, gap: 12 }}>
