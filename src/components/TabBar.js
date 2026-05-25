@@ -4,9 +4,9 @@ import { C } from '../../theme';
 import { useNav } from '../nav';
 
 const TABS = [
-  { key: 'home', icon: '🏠', label: 'Home' },
-  { key: 'explore', icon: '🗺️', label: 'Map' },
-  { key: 'lists', icon: '✨', label: 'AI Chat' },
+  { key: 'home',    icon: '🏠', label: 'Home'    },
+  { key: 'explore', icon: '🗺️', label: 'Map'     },
+  { key: 'friends', icon: '👥', label: 'Friends' },
   { key: 'profile', icon: '👤', label: 'Profile' },
 ];
 

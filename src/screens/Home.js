@@ -59,9 +59,10 @@ export default function Home() {
       <LinearGradient colors={[C.brand, '#0c4aa0']} style={s.header}>
         <View style={{ height: 28 }} />
         <Text style={s.greet}>Good evening,{'\n'}{first}</Text>
-        <TouchableOpacity style={s.search} onPress={() => switchTab('explore')} activeOpacity={0.85}>
-          <Text style={s.searchTxt}>🔍  What are you in the mood for?</Text>
-          <Text style={s.searchAi}>AI</Text>
+        <TouchableOpacity style={s.search} onPress={() => navigate('search')} activeOpacity={0.85}>
+          <Text style={{ fontSize: 15, marginRight: 6 }}>✨</Text>
+          <Text style={s.searchPlaceholder}>What are you in the mood for?</Text>
+          <View style={s.searchAiBadge}><Text style={s.searchAiBadgeTxt}>AI</Text></View>
         </TouchableOpacity>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
           {['Near me', 'Date night', 'Late night', 'Brunch'].map((c) => (
@@ -124,9 +125,10 @@ export default function Home() {
 const s = StyleSheet.create({
   header: { paddingHorizontal: 18, paddingBottom: 18 },
   greet: { fontSize: 28, fontWeight: '800', color: '#fff', lineHeight: 33, marginBottom: 14 },
-  search: { backgroundColor: '#fff', borderRadius: 50, flexDirection: 'row', alignItems: 'center', padding: 14, marginBottom: 12 },
-  searchTxt: { flex: 1, fontSize: 14, color: C.sub },
-  searchAi: { fontSize: 11, fontWeight: '800', color: C.brand },
+  search:           { backgroundColor: 'rgba(255,255,255,0.15)', borderRadius: 50, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, marginBottom: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
+  searchPlaceholder:{ flex: 1, fontSize: 14, color: 'rgba(255,255,255,0.65)' },
+  searchAiBadge:    { backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 20, paddingHorizontal: 10, paddingVertical: 3 },
+  searchAiBadgeTxt: { fontSize: 11, fontWeight: '800', color: '#fff' },
   chip: { borderRadius: 20, paddingHorizontal: 14, paddingVertical: 7, borderWidth: 1, borderColor: 'rgba(255,255,255,0.35)' },
   chipTxt: { fontSize: 12, fontWeight: '600', color: '#fff' },
   remind: { flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: '#fff', padding: 16, marginTop: 1 },

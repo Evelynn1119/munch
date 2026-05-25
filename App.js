@@ -10,14 +10,17 @@ import TabBar from './src/components/TabBar';
 import Onboarding from './src/screens/Onboarding';
 import Home from './src/screens/Home';
 import Explore from './src/screens/Explore';
-import Lists, { ListDetail } from './src/screens/Lists';
+import { ListDetail } from './src/screens/Lists';
+import Friends from './src/screens/Friends';
 import Profile from './src/screens/Profile';
 import RestaurantDetail from './src/screens/RestaurantDetail';
 import AddRestaurant from './src/screens/AddRestaurant';
 import RateVisit from './src/screens/RateVisit';
 import PlanWithFriend from './src/screens/PlanWithFriend';
+import AIChat from './src/screens/AIChat';
+import Search from './src/screens/Search';
 
-const TABS = { home: Home, explore: Explore, lists: Lists, profile: Profile };
+const TABS = { home: Home, explore: Explore, friends: Friends, profile: Profile };
 
 function Root() {
   const { state } = useStore();
@@ -58,6 +61,8 @@ function StackScreen({ screen, params }) {
     case 'add': return <AddRestaurant />;
     case 'plan': return <PlanWithFriend friendId={params.friendId} />;
     case 'listDetail': return <ListDetail listId={params.listId} />;
+    case 'aiChat':    return <AIChat query={params.query} />;
+    case 'search':    return <Search />;
     default: return null;
   }
 }
